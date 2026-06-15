@@ -36,14 +36,14 @@ const LandingPage = () => {
 
             <BlurText 
               text="Eventos de Tecnología en un Solo Lugar" 
-              className="text-6xl md:text-7xl lg:text-[5.5rem] font-heading italic text-white leading-[0.8] max-w-2xl justify-center tracking-[-4px]"
+              className="text-5xl md:text-7xl lg:text-[5.5rem] font-heading italic text-white leading-[0.8] max-w-2xl justify-center tracking-[-2px] md:tracking-[-4px]"
             />
 
             <motion.p
               initial={{ filter: 'blur(10px)', opacity: 0, y: 20 }}
               animate={{ filter: 'blur(0px)', opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-              className="mt-4 text-sm md:text-base text-white max-w-2xl font-body font-light leading-tight mx-auto"
+              className="mt-4 text-sm md:text-base text-white max-w-2xl font-body font-light leading-tight mx-auto px-4 md:px-0"
             >
               Filtra y regístrate en conferencias, hackathons y talleres. Olvídate del ruido digital y nunca vuelvas a perder una oportunidad de networking o aprendizaje colaborativo.
             </motion.p>
@@ -52,15 +52,15 @@ const LandingPage = () => {
               initial={{ filter: 'blur(10px)', opacity: 0, y: 20 }}
               animate={{ filter: 'blur(0px)', opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.1, ease: "easeOut" }}
-              className="flex items-center gap-6 mt-6"
+              className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 mt-6"
             >
               <button 
                 onClick={() => navigate('/dashboard')}
-                className="liquid-glass-strong rounded-full px-5 py-2.5 text-sm font-medium text-white flex items-center gap-2 hover:scale-105 transition-transform"
+                className="liquid-glass-strong rounded-full px-5 py-2.5 text-sm font-medium text-white flex items-center gap-2 hover:scale-105 transition-transform w-full sm:w-auto justify-center"
               >
                 Explorar Eventos <ArrowUpRight className="h-5 w-5" />
               </button>
-              <button className="flex items-center gap-2 text-sm font-medium text-white hover:text-white/80 transition-colors">
+              <button className="flex items-center gap-2 text-sm font-medium text-white hover:text-white/80 transition-colors w-full sm:w-auto justify-center py-2 sm:py-0">
                 Ver Demo <Play className="h-4 w-4" />
               </button>
             </motion.div>
@@ -69,9 +69,9 @@ const LandingPage = () => {
               initial={{ filter: 'blur(10px)', opacity: 0, y: 20 }}
               animate={{ filter: 'blur(0px)', opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.3, ease: "easeOut" }}
-              className="flex items-stretch gap-4 mt-8 flex-wrap justify-center"
+              className="flex flex-col sm:flex-row items-stretch gap-4 mt-8 w-full max-w-sm sm:max-w-none sm:w-auto justify-center"
             >
-              <div className="liquid-glass p-5 w-[220px] rounded-[1.25rem] flex flex-col text-left">
+              <div className="liquid-glass p-5 w-full sm:w-[220px] rounded-[1.25rem] flex flex-col text-left">
                 <svg className="h-7 w-7 text-white mb-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M12 6v6l4 2" />
@@ -81,7 +81,7 @@ const LandingPage = () => {
                   <div className="text-xs text-white font-body font-light mt-2">Eventos Mensuales</div>
                 </div>
               </div>
-              <div className="liquid-glass p-5 w-[220px] rounded-[1.25rem] flex flex-col text-left">
+              <div className="liquid-glass p-5 w-full sm:w-[220px] rounded-[1.25rem] flex flex-col text-left">
                 <svg className="h-7 w-7 text-white mb-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -99,20 +99,20 @@ const LandingPage = () => {
             initial={{ filter: 'blur(10px)', opacity: 0, y: 20 }}
             animate={{ filter: 'blur(0px)', opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.4, ease: "easeOut" }}
-            className="flex flex-col items-center gap-4 pb-8"
+            className="flex flex-col items-center gap-4 pb-8 px-4"
           >
-            <div className="liquid-glass rounded-full px-3.5 py-1 text-xs font-medium text-white">
+            <div className="liquid-glass rounded-full px-3.5 py-1 text-[10px] md:text-xs font-medium text-white text-center">
               Comunidades e institutos que confían en Openhub
             </div>
-            <div className="flex items-center gap-12 md:gap-16 font-heading italic text-white text-2xl md:text-3xl tracking-tight">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 md:gap-16 font-heading italic text-white text-xl sm:text-2xl md:text-3xl tracking-tight">
               <span>GDG</span>
-              <span className="text-white/50 text-xl">&middot;</span>
+              <span className="text-white/50 text-xl hidden sm:inline">&middot;</span>
               <span>TechMeet</span>
-              <span className="text-white/50 text-xl">&middot;</span>
+              <span className="text-white/50 text-xl hidden sm:inline">&middot;</span>
               <span>Hackers</span>
-              <span className="text-white/50 text-xl">&middot;</span>
+              <span className="text-white/50 text-xl hidden sm:inline">&middot;</span>
               <span>Devs</span>
-              <span className="text-white/50 text-xl">&middot;</span>
+              <span className="text-white/50 text-xl hidden sm:inline">&middot;</span>
               <span>Innova</span>
             </div>
           </motion.div>
@@ -126,10 +126,10 @@ const LandingPage = () => {
           className="absolute inset-0 w-full h-full object-cover z-0"
         />
         
-        <div className="relative z-10 px-8 md:px-16 lg:px-20 pt-24 pb-10 flex flex-col min-h-screen">
+        <div className="relative z-10 px-6 md:px-16 lg:px-20 pt-24 pb-10 flex flex-col min-h-screen">
           <div className="mb-auto">
             <div className="text-sm font-body text-white/80 mb-6">// La Solución</div>
-            <h2 className="font-heading italic text-white text-6xl md:text-7xl lg:text-[6rem] leading-[0.9] tracking-[-3px]">
+            <h2 className="font-heading italic text-white text-5xl md:text-7xl lg:text-[6rem] leading-[0.9] tracking-[-2px] md:tracking-[-3px]">
               Conexión<br/>sin ruido
             </h2>
           </div>

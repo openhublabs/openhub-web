@@ -40,14 +40,14 @@ const DashboardPage = () => {
         className="fixed inset-0 w-full h-full object-cover z-0"
       />
 
-      <div className="relative z-10 w-full h-screen flex flex-col p-6">
+      <div className="relative z-10 w-full h-screen flex flex-col p-4 md:p-6">
         
         {/* Top Navbar / Pill */}
         <motion.header 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex items-center justify-between w-full max-w-7xl mx-auto mb-10 relative z-50"
+          className="flex items-center justify-between w-full max-w-7xl mx-auto mb-6 md:mb-10 relative z-50 gap-2"
         >
           {/* Left Controls */}
           <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ const DashboardPage = () => {
               onClick={() => navigate('/')} 
               className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/10 transition-colors relative z-50"
             >
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -67,7 +67,7 @@ const DashboardPage = () => {
                 <div className={`w-10 h-6 rounded-full flex items-center p-0.5 transition-colors ${isConfigOpen ? 'bg-blue-500' : 'bg-white/20'}`}>
                   <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform ${isConfigOpen ? 'translate-x-4' : 'translate-x-0'}`}></div>
                 </div>
-                <span className="text-sm font-medium pr-2 text-white/90">Configuración</span>
+                <span className="hidden sm:inline text-sm font-medium pr-2 text-white/90">Configuración</span>
               </button>
               
               {/* Config Popover */}
@@ -116,7 +116,7 @@ const DashboardPage = () => {
             <div className="liquid-glass rounded-full p-1.5 flex items-center relative">
               <button 
                 onClick={() => setActiveTab('directorio')}
-                className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === 'directorio' ? 'text-black' : 'text-white/80 hover:text-white'}`}
+                className={`relative px-3 py-1.5 md:px-4 text-xs md:text-sm font-medium transition-colors ${activeTab === 'directorio' ? 'text-black' : 'text-white/80 hover:text-white'}`}
               >
                 {activeTab === 'directorio' && (
                   <motion.div layoutId="navPill" className="absolute inset-0 bg-white rounded-full shadow-sm" transition={{ type: "spring", stiffness: 300, damping: 25 }} />
@@ -125,7 +125,7 @@ const DashboardPage = () => {
               </button>
               <button 
                 onClick={() => setActiveTab('dashboard')}
-                className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-black' : 'text-white/80 hover:text-white'}`}
+                className={`relative px-3 py-1.5 md:px-4 text-xs md:text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-black' : 'text-white/80 hover:text-white'}`}
               >
                 {activeTab === 'dashboard' && (
                   <motion.div layoutId="navPill" className="absolute inset-0 bg-white rounded-full shadow-sm" transition={{ type: "spring", stiffness: 300, damping: 25 }} />
@@ -152,19 +152,17 @@ const DashboardPage = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-[100] flex items-start justify-center pt-32 px-4"
-              style={{ willChange: "opacity" }}
+              className="fixed inset-0 z-[100] flex items-start justify-center pt-32 px-4 bg-black/20 backdrop-blur-3xl"
             >
-              {/* Overlay background to close with heavy blur */}
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-[30px] cursor-pointer" onClick={() => setIsSearchOpen(false)}></div>
+              {/* Overlay background to close */}
+              <div className="absolute inset-0 cursor-pointer" onClick={() => setIsSearchOpen(false)}></div>
               
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95, y: -20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -20 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
-                className="w-full max-w-2xl bg-black/40 liquid-glass-strong rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative z-10 flex flex-col"
+                className="w-[calc(100%-2rem)] md:w-full max-w-2xl bg-white/10 liquid-glass-strong rounded-2xl overflow-hidden shadow-2xl border border-white/20 relative z-10 flex flex-col"
               >
                 <div className="flex items-center px-4 py-4 border-b border-white/10">
                   <svg className="w-6 h-6 text-white/50 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,33 +176,37 @@ const DashboardPage = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  <div className="px-2 py-1 bg-white/10 rounded text-[10px] text-white/50 font-mono tracking-widest">ESC</div>
+                  <div className="hidden sm:block px-3 py-1 liquid-glass rounded-[0.4rem] text-[10px] text-white/70 font-heading tracking-widest border border-white/20 shadow-sm">ESC</div>
                 </div>
-                <div className="p-2 max-h-[400px] overflow-y-auto">
-                  <div className="px-4 py-2 text-xs font-medium text-white/40 uppercase tracking-wider">Eventos Recientes</div>
-                  <div className="flex items-center justify-between p-3 mx-2 my-1 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <div className="p-3 max-h-[400px] overflow-y-auto">
+                  <div className="px-4 py-2 text-xs font-heading italic text-white/60 tracking-wider">Eventos Recientes</div>
+                  
+                  {/* Item 1 */}
+                  <div className="flex items-center justify-between p-3 mx-1 my-1 hover:bg-white/10 rounded-2xl cursor-pointer transition-all duration-300 group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-[0.8rem] liquid-glass border border-white/20 shadow-[inset_0_2px_10px_rgba(255,255,255,0.2)] flex items-center justify-center text-white relative overflow-hidden">
+                        <svg className="w-5 h-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">Hackathon Global AI</div>
-                        <div className="text-xs text-white/50">Directorio • En 2 días</div>
+                        <div className="text-base font-medium font-heading text-white group-hover:text-blue-300 transition-colors">Hackathon Global AI</div>
+                        <div className="text-xs font-body font-light text-white/50 mt-0.5">Directorio • En 2 días</div>
                       </div>
                     </div>
-                    <svg className="w-4 h-4 text-white/20 group-hover:text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    <svg className="w-5 h-5 text-white/20 group-hover:text-white/80 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" /></svg>
                   </div>
-                  <div className="flex items-center justify-between p-3 mx-2 my-1 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+
+                  {/* Item 2 */}
+                  <div className="flex items-center justify-between p-3 mx-1 my-1 hover:bg-white/10 rounded-2xl cursor-pointer transition-all duration-300 group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-[0.8rem] liquid-glass border border-white/20 shadow-[inset_0_2px_10px_rgba(255,255,255,0.2)] flex items-center justify-center text-white relative overflow-hidden">
+                        <svg className="w-5 h-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">Q&A Innovación B2B</div>
-                        <div className="text-xs text-white/50">Sala Virtual • En vivo</div>
+                        <div className="text-base font-medium font-heading text-white group-hover:text-emerald-300 transition-colors">Q&A Innovación B2B</div>
+                        <div className="text-xs font-body font-light text-white/50 mt-0.5">Sala Virtual • En vivo</div>
                       </div>
                     </div>
-                    <svg className="w-4 h-4 text-white/20 group-hover:text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    <svg className="w-5 h-5 text-white/20 group-hover:text-white/80 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" /></svg>
                   </div>
                 </div>
               </motion.div>
@@ -247,7 +249,7 @@ const DashboardPage = () => {
                       <LiquidAvatar colorClass="from-orange-400 to-rose-400" />
                       <LiquidAvatar colorClass="from-purple-400 to-indigo-400" />
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium">9</div>
+                    <div className="w-8 h-8 rounded-full liquid-glass border border-white/20 shadow-sm flex items-center justify-center text-xs font-medium">9</div>
                   </div>
                 </div>
 
@@ -258,7 +260,7 @@ const DashboardPage = () => {
                   </div>
                   <div className="flex items-end gap-1 h-20 mt-4">
                     {[40, 70, 45, 90, 65, 85, 30, 50, 80, 40, 60, 100].map((h, i) => (
-                      <div key={i} className="w-full bg-blue-500/80 rounded-t-sm transition-all duration-1000 ease-out" style={{ height: `${h}%` }}></div>
+                      <div key={i} className="w-full liquid-glass border border-white/20 rounded-t-sm transition-all duration-1000 ease-out" style={{ height: `${h}%` }}></div>
                     ))}
                   </div>
                   <div className="flex items-center justify-between mt-4">
@@ -266,7 +268,7 @@ const DashboardPage = () => {
                       <LiquidAvatar colorClass="from-pink-500 to-orange-400" size="w-7 h-7" border="border" />
                       <LiquidAvatar colorClass="from-teal-400 to-emerald-500" size="w-7 h-7" border="border" />
                     </div>
-                    <button className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
+                    <button className="w-8 h-8 rounded-full liquid-glass border border-white/20 text-white flex items-center justify-center hover:scale-105 transition-transform">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" /></svg>
                     </button>
                   </div>
@@ -274,7 +276,7 @@ const DashboardPage = () => {
 
                 {/* Card 4 */}
                 <div className="liquid-glass rounded-[1.75rem] p-6 flex flex-col justify-between relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="relative z-10">
                     <h3 className="text-xl font-medium">DevDays 2026</h3>
                     <p className="text-sm text-white/60 mt-1">Conferencia Anual</p>
@@ -295,20 +297,20 @@ const DashboardPage = () => {
                       <LiquidAvatar colorClass="from-red-400 to-pink-500" />
                       <LiquidAvatar colorClass="from-yellow-400 to-orange-500" />
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium">3</div>
+                    <div className="w-8 h-8 rounded-full liquid-glass border border-white/20 shadow-sm flex items-center justify-center text-xs font-medium">3</div>
                   </div>
                 </div>
 
                 {/* Card 6: Video/Live placeholder */}
-                <div className="liquid-glass rounded-[1.75rem] p-6 flex flex-col justify-between relative overflow-hidden">
-                  <div className="absolute inset-0 bg-emerald-500/20"></div>
+                <div className="liquid-glass rounded-[1.75rem] p-6 flex flex-col justify-between relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="relative z-10">
                     <h3 className="text-xl font-medium">Q&A Innovación B2B</h3>
                     <p className="text-sm text-white/60 mt-1">Sala Virtual en Vivo</p>
                   </div>
                   <div className="relative z-10 flex items-center justify-between">
                     <LiquidAvatar colorClass="from-purple-500 to-indigo-500" />
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium">6</div>
+                    <div className="w-8 h-8 rounded-full liquid-glass border border-white/20 shadow-sm flex items-center justify-center text-xs font-medium">6</div>
                   </div>
                 </div>
 
@@ -323,7 +325,7 @@ const DashboardPage = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <LiquidAvatar colorClass="from-orange-400 to-red-400" />
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium">2</div>
+                    <div className="w-8 h-8 rounded-full liquid-glass border border-white/20 shadow-sm flex items-center justify-center text-xs font-medium">2</div>
                   </div>
                 </div>
 
@@ -331,16 +333,16 @@ const DashboardPage = () => {
                 <div className="liquid-glass rounded-[1.75rem] p-4 flex flex-col justify-between">
                   <div className="flex justify-between items-center px-2 mb-2">
                     <div className="flex gap-2">
-                      <span className="text-xs bg-blue-500/20 text-blue-200 px-2 py-0.5 rounded-sm">Transmisión</span>
+                      <span className="text-xs liquid-glass border border-white/20 text-white/90 px-2 py-0.5 rounded-sm shadow-sm">Transmisión</span>
                       <span className="text-xs text-white/60">En vivo</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2 flex-1">
-                    <div className="rounded-xl bg-white/10 overflow-hidden relative">
-                      <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover opacity-80" alt="Audience" />
+                    <div className="rounded-xl liquid-glass border border-white/10 overflow-hidden relative group cursor-pointer">
+                      <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity mix-blend-luminosity" alt="Audience" />
                     </div>
-                    <div className="rounded-xl bg-white/10 overflow-hidden relative">
-                      <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover opacity-80" alt="Speaker" />
+                    <div className="rounded-xl liquid-glass border border-white/10 overflow-hidden relative group cursor-pointer">
+                      <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity mix-blend-luminosity" alt="Speaker" />
                     </div>
                   </div>
                   <div className="flex items-center justify-between px-2 mt-3">
@@ -391,7 +393,7 @@ const DashboardPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 liquid-glass-strong rounded-full px-2 py-2 flex items-center gap-4 z-50"
+          className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 liquid-glass-strong rounded-full px-2 py-2 flex items-center gap-2 md:gap-4 z-50 scale-90 md:scale-100 origin-bottom"
         >
           <div className="flex items-center pl-2">
             <div className="flex space-x-2">
