@@ -10,7 +10,6 @@ const LandingPage = () => {
 
   return (
     <div className="bg-black min-h-screen text-white font-body selection:bg-white/30">
-      
       {/* Section 1 - Hero */}
       <section className="relative w-full h-screen overflow-hidden flex flex-col justify-between">
         <FadingVideo 
@@ -135,21 +134,10 @@ const LandingPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-            {/* Card 1 */}
             <div className="liquid-glass rounded-[1.25rem] p-6 md:p-8 min-h-[400px] flex flex-col">
               <div className="flex items-start justify-between gap-4">
                 <div className="w-12 h-12 liquid-glass rounded-[0.75rem] flex items-center justify-center shrink-0">
                   <SceneryIcon className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex flex-col gap-2 items-end">
-                  <div className="flex gap-2">
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">Directorio Central</span>
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">Filtros</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">Estudiantes</span>
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">Profesionales</span>
-                  </div>
                 </div>
               </div>
               <div className="flex-1"></div>
@@ -161,21 +149,10 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Card 2 */}
             <div className="liquid-glass rounded-[1.25rem] p-6 md:p-8 min-h-[400px] flex flex-col">
               <div className="flex items-start justify-between gap-4">
                 <div className="w-12 h-12 liquid-glass rounded-[0.75rem] flex items-center justify-center shrink-0">
                   <MovieIcon className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex flex-col gap-2 items-end">
-                  <div className="flex gap-2">
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">SaaS B2B</span>
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">Métricas</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">Push Alerts</span>
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">Destacados</span>
-                  </div>
                 </div>
               </div>
               <div className="flex-1"></div>
@@ -187,21 +164,10 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Card 3 */}
             <div className="liquid-glass rounded-[1.25rem] p-6 md:p-8 min-h-[400px] flex flex-col">
               <div className="flex items-start justify-between gap-4">
                 <div className="w-12 h-12 liquid-glass rounded-[0.75rem] flex items-center justify-center shrink-0">
                   <LightbulbIcon className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex flex-col gap-2 items-end">
-                  <div className="flex gap-2">
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">MVVM</span>
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">API REST</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">OAuth 2.0</span>
-                    <span className="liquid-glass border border-white/10 rounded-full px-3.5 py-1.5 text-[11px] md:text-xs text-white/90 font-body whitespace-nowrap">SSL/TLS</span>
-                  </div>
                 </div>
               </div>
               <div className="flex-1"></div>
@@ -213,7 +179,6 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
-
         </div>
       </section>
     </div>
