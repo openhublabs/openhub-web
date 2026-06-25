@@ -10,17 +10,14 @@ const Navbar = () => {
       
       <div className="hidden lg:flex liquid-glass rounded-full px-1.5 py-1.5 items-center">
         <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Inicio</a>
-        <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Eventos</a>
-        <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Comunidad</a>
-        <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Organizadores</a>
-        <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Precios</a>
+        <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Usuarios</a>
         
         {/* Cambiado de "Admin" a "Login" para cumplir con el estándar UX */}
         <button 
-          onClick={() => navigate('/login')} 
+          onClick={() => navigate('/Login')} 
           className="px-4 py-2 text-sm font-medium text-white/80 font-body hover:text-white transition-colors rounded-full text-left"
         >
-          Login
+          Unete
         </button>
 
         <button className="bg-white text-black px-3 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 ml-2 whitespace-nowrap hover:bg-white/90 transition-colors">
