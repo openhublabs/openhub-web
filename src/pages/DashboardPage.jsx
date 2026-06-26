@@ -25,7 +25,7 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => {
         <span className="truncate">{selectedOption?.label || placeholder}</span>
         <ChevronDown className={`w-4 h-4 ml-2 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isOpen && (
           <>
             <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
@@ -361,12 +361,6 @@ const DashboardPage = () => {
           </div>
 
           <div className="flex items-center gap-3 relative z-50">
-            <div className="liquid-glass rounded-full p-1.5 flex items-center relative">
-              <button onClick={() => setActiveTab('dashboard')} className={`relative px-3 py-1.5 md:px-4 text-xs md:text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-black' : 'text-white/80 hover:text-white'}`}>
-                {activeTab === 'dashboard' && <motion.div layoutId="navPill" className="absolute inset-0 bg-white rounded-full shadow-sm" transition={{ type: "spring", stiffness: 300, damping: 25 }} />}
-                <span className="relative z-10">Dashboard</span>
-              </button>
-            </div>
             <button onClick={() => setIsSearchOpen(true)} className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/20 transition-colors">
               <Search className="w-4 h-4 text-white" />
             </button>
@@ -599,7 +593,7 @@ const DashboardPage = () => {
 
           {/* MODAL: LISTA DE EVENTOS */}
           {activeModal === 'eventsList' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+            <motion.div key="eventsList" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
               <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal(null)}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-4xl liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl h-[80vh] flex flex-col">
                 <div className="flex justify-between items-center mb-6 shrink-0 border-b border-white/10 pb-4">
@@ -645,7 +639,7 @@ const DashboardPage = () => {
 
           {/* MODAL: CREAR/EDITAR EVENTO */}
           {(activeModal === 'newEvent' || activeModal === 'editEvent') && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+            <motion.div key={activeModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
               <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => { setActiveModal('eventsList'); setEditingEvent(null); }}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
@@ -677,7 +671,7 @@ const DashboardPage = () => {
 
           {/* MODAL: LISTA DE USUARIOS */}
           {activeModal === 'usersList' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+            <motion.div key="usersList" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
               <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal(null)}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-4xl liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl h-[80vh] flex flex-col">
                 
@@ -734,7 +728,7 @@ const DashboardPage = () => {
 
           {/* MODAL: CREAR USUARIO */}
           {activeModal === 'newUser' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+            <motion.div key="newUser" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
               <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal('usersList')}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
