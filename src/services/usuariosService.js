@@ -9,7 +9,7 @@ export const obtenerUsuarios = async () => {
     const usuarios = await response.json();
     return usuarios;
   } catch (error) {
-    console.error("Error al obtener usuarios de Auth:", error);
+    // console.error suppressed to avoid noise when backend is not running
     return [];
   }
 };

@@ -153,6 +153,18 @@ const DashboardPage = () => {
   // ==========================================
   // CALCULAR ESTADÍSTICAS (ADAPTADO A AUTH)
   // ==========================================
+  // ESC global listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setActiveModal(null);
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const calcularEstadisticas = () => {
     const ahora = new Date();
     const hace7Dias = new Date(ahora.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -349,7 +361,7 @@ const DashboardPage = () => {
             <button onClick={() => navigate('/')} className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/10 transition-colors relative z-50">
               <Home className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </button>
-            <button onClick={handleCerrarSesion} className="liquid-glass rounded-full px-4 py-2 flex items-center gap-2 hover:bg-white/80/20 hover:text-white/90 transition-colors cursor-pointer text-white/90">
+            <button onClick={handleCerrarSesion} className="liquid-glass rounded-full px-4 py-2 flex items-center gap-2 hover:bg-white/20 hover:text-white/90 transition-colors cursor-pointer text-white/90">
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline text-sm font-medium pr-1">Cerrar Sesión</span>
             </button>
@@ -375,10 +387,10 @@ const DashboardPage = () => {
               <motion.div initial={{ opacity: 0, scale: 0.95, y: -20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -20 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-[calc(100%-2rem)] md:w-full max-w-2xl bg-white/10 liquid-glass-strong rounded-2xl overflow-hidden shadow-2xl border border-white/20 relative z-10 flex flex-col">
                 <div className="flex items-center px-4 py-4 border-b border-white/10">
                   <Search className="w-6 h-6 text-white/50 mr-3" />
-                  <input type="text" autoFocus placeholder="Buscar eventos..." className="flex-1 bg-transparent border-none outline-none text-xl text-white placeholder-white/30 font-body" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                  <input type="text" autoFocus placeholder="Buscar eventos..." className="flex-1 bg-transparent border-none outline-none text-xl text-white placeholder-white/30 font-body" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => { if(e.key === 'Escape') setIsSearchOpen(false); }} />
                   <div className="hidden sm:block px-3 py-1 liquid-glass rounded-[0.4rem] text-[10px] text-white/70 font-heading tracking-widest border border-white/20 shadow-sm">ESC</div>
                 </div>
-                <div className="p-3 max-h-[400px] overflow-y-auto">
+                <div className="p-3 max-h-[400px] overflow-y-auto custom-scrollbar">
                   <div className="px-4 py-2 text-xs font-heading italic text-white/60 tracking-wider">Eventos en la Red</div>
                   {eventos.filter(e => (e.titulo || '').toLowerCase().includes(searchQuery.toLowerCase())).map((ev) => (
                     <div key={ev.id} className="flex items-center justify-between p-3 mx-1 my-1 hover:bg-white/10 rounded-2xl cursor-pointer transition-all duration-300 group">
@@ -627,7 +639,7 @@ const DashboardPage = () => {
                         </div>
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => { setEditingEvent(ev); setActiveModal('editEvent'); }} className="px-3 py-1.5 rounded-lg bg-white/80/20 hover:bg-white/80/30 text-blue-300 text-xs font-medium">Editar</button>
-                          <button onClick={() => handleBorrarEvento(ev.id)} className="px-3 py-1.5 rounded-lg bg-white/80/10 hover:bg-white/80/20 text-white/90 text-xs font-medium">Eliminar</button>
+                          <button onClick={() => handleBorrarEvento(ev.id)} className="px-3 py-1.5 rounded-lg bg-white/80/10 hover:bg-white/20 text-white/90 text-xs font-medium">Eliminar</button>
                         </div>
                       </div>
                     ))
@@ -715,7 +727,7 @@ const DashboardPage = () => {
                             </span>
                           </div>
                           <div className="col-span-4 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleBorrarUsuario(u.id)} className="px-3 py-1.5 rounded-lg bg-white/80/10 hover:bg-white/80/20 text-white/90 text-xs font-medium">Banear</button>
+                            <button onClick={() => handleBorrarUsuario(u.id)} className="px-3 py-1.5 rounded-lg bg-white/80/10 hover:bg-white/20 text-white/90 text-xs font-medium">Banear</button>
                           </div>
                         </div>
                       ))
