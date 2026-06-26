@@ -3,7 +3,9 @@ const cors = require('cors');
 const { cert, initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 
-const serviceAccount = require("./firebase-admin.json");
+const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+  : require("./firebase-admin.json");
 
 initializeApp({
   credential: cert(serviceAccount)

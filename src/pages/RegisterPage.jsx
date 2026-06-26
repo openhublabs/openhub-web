@@ -33,11 +33,11 @@ export default function RegisterPage() {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 2. Guarda al usuario en Firestore automáticamente como ADMINISTRADOR
+            // 2. Guarda al usuario en Firestore automáticamente como MIEMBRO
             await crearUsuario({
                 id: user.uid, 
                 email: user.email,
-                rol: 'ADMINISTRADOR', 
+                rol: 'MIEMBRO', 
                 estado: 'Activo',
                 createdAt: new Date(),
                 updatedAt: new Date()
