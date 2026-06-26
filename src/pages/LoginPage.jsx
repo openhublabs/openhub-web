@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -11,6 +11,16 @@ export default function LoginPage() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Escuchar tecla ESC para salir del login
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                navigate('/');
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [navigate]);
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email || !password) {
@@ -37,7 +47,11 @@ export default function LoginPage() {
 
     return (
         <div className="bg-black min-h-screen text-white font-body relative flex items-center justify-center overflow-hidden selection:bg-white/30">
-            {/* Luces Espaciales de fondo */}
+            {/* Imagen de fondo inmersiva y luces */}
+            <div className="absolute inset-0 z-0">
+                <img src="/assets/hero.gif" alt="Fondo Espacial" className="w-full h-full object-cover opacity-50" />
+                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+            </div>
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-sky-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
             
             {/* Botón flotante para regresar a la Landing */}
@@ -51,15 +65,19 @@ export default function LoginPage() {
 
             {/* Contenedor con Animación Fluida */}
             <motion.div 
-                initial={{ filter: 'blur(10px)', opacity: 0, y: 30 }}
-                animate={{ filter: 'blur(0px)', opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                initial={{ filter: 'blur(15px)', opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ filter: 'blur(0px)', opacity: 1, scale: 1, y: 0 }}
+                exit={{ filter: 'blur(10px)', opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                 className="z-10 w-full max-w-md px-4 py-8"
             >
-                <div className="liquid-glass-strong rounded-[2rem] p-10 relative border border-white/10 backdrop-blur-xl bg-black/40 shadow-2xl">
-                    <div className="text-center mb-8">
-                        <h2 className="font-heading italic text-white text-4xl md:text-5xl tracking-tight leading-none mb-3">OpenHub</h2>
-                        <p className="text-sm text-white/60 font-light font-body">Ingresa al ecosistema administrativo</p>
+                <div className="rounded-[2.5rem] p-10 relative border border-white/10 backdrop-blur-2xl bg-black/20 shadow-[0_0_80px_rgba(255,255,255,0.05)] overflow-hidden">
+                    {/* Brillo superior en el cristal */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
+                    
+                    <div className="text-center mb-8 relative z-10">
+                        <h2 className="font-heading italic text-white text-5xl md:text-5xl tracking-tight leading-none mb-3 drop-shadow-md">OpenHub</h2>
+                        <p className="text-sm text-white/50 font-light font-body">Ingresa al ecosistema administrativo</p>
                     </div>
 
                     {error && (
@@ -73,25 +91,25 @@ export default function LoginPage() {
                     )}
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-medium text-white/50 pl-1">// Identidad</label>
+                        <div className="flex flex-col gap-1.5 relative z-10">
+                            <label className="text-xs font-medium text-white/40 pl-1 uppercase tracking-wider">// Identidad</label>
                             <input
                                 type="email"
                                 placeholder="nombre@correo.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:outline-none focus:bg-white/10 transition-all font-body font-light"
+                                className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl px-5 text-sm text-white placeholder-white/20 focus:outline-none focus:bg-white/10 focus:border-white/30 transition-all font-body font-light"
                             />
                         </div>
 
-                        <div className="flex flex-col gap-1.5 mb-2">
-                            <label className="text-xs font-medium text-white/50 pl-1">// Clave de acceso</label>
+                        <div className="flex flex-col gap-1.5 mb-2 relative z-10">
+                            <label className="text-xs font-medium text-white/40 pl-1 uppercase tracking-wider">// Clave de acceso</label>
                             <input
                                 type="password"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-sm text-white focus:outline-none focus:bg-white/10 transition-all font-body font-light"
+                                className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl px-5 text-sm text-white placeholder-white/20 focus:outline-none focus:bg-white/10 focus:border-white/30 transition-all font-body font-light"
                             />
                         </div>
 
@@ -103,12 +121,7 @@ export default function LoginPage() {
                             {isLoading ? 'Cargando...' : 'Autenticar Entrada →'}
                         </button>
                         
-                        <div className="mt-4 text-center">
-                            <span className="text-xs text-white/50">¿No tienes una cuenta? </span>
-                            <Link to="/register" className="text-xs text-white hover:text-white/80 transition-colors font-medium">
-                                Regístrate
-                            </Link>
-                        </div>
+
                     </form>
                 </div>
             </motion.div>

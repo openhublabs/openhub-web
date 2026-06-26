@@ -1,11 +1,58 @@
+/* eslint-disable */
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { LogOut, Search, Users, Calendar, Activity, ChevronDown, Check, Home } from 'lucide-react';
 import FadingVideo from '../components/ui/FadingVideo';
 import { obtenerEventos, crearEvento, borrarEvento, actualizarEvento } from '../services/EventosService';
 import { obtenerUsuarios, crearUsuario, borrarUsuario, actualizarUsuario } from '../services/usuariosService';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
+
+
+
+const CustomSelect = ({ value, onChange, options, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find(opt => opt.value === value) || options[0];
+
+  return (
+    <div className="relative min-w-[160px] flex-1">
+      <button 
+        type="button"
+        onClick={() => setIsOpen(!isOpen)} 
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white flex items-center justify-between hover:bg-white/10 transition-colors h-10"
+      >
+        <span className="truncate">{selectedOption?.label || placeholder}</span>
+        <ChevronDown className={`w-4 h-4 ml-2 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
+            <motion.div 
+              initial={{ opacity: 0, y: -5, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -5, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute top-full left-0 right-0 mt-1 bg-black/80 backdrop-blur-3xl border border-white/20 rounded-xl overflow-hidden shadow-2xl z-50 p-1"
+            >
+              {options.map((opt) => (
+                <div 
+                  key={opt.value}
+                  onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                  className={`px-3 py-2 text-sm rounded-lg cursor-pointer flex items-center justify-between transition-colors ${value === opt.value ? 'bg-white/20 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
+                >
+                  <span className="truncate">{opt.label}</span>
+                  {value === opt.value && <Check className="w-4 h-4 flex-shrink-0 ml-2" />}
+                </div>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -171,7 +218,7 @@ const DashboardPage = () => {
         isOnline: formDataEvento.isOnline === 'true',
         clips: 0
       });
-      cargarEventEventos();
+      cargarEventos();
       setFormDataEvento({
         titulo: '', organizador: '', categoria: 'inteligencia artificial', fecha: '',
         horaInicio: '', horaFin: '', isOnline: 'false', ubicacion: '', imagenUrl: '',
@@ -300,39 +347,17 @@ const DashboardPage = () => {
         <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut" }} className="flex items-center justify-between w-full max-w-7xl mx-auto mb-6 md:mb-10 relative z-50 gap-2">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/')} className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/10 transition-colors relative z-50">
-              <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <Home className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </button>
-            <div className="relative">
-              <button onClick={() => setIsConfigOpen(!isConfigOpen)} className="liquid-glass rounded-full px-4 py-2 flex items-center gap-3 hover:bg-white/5 transition-colors cursor-pointer">
-                <div className={`w-10 h-6 rounded-full flex items-center p-0.5 transition-colors ${isConfigOpen ? 'bg-blue-500' : 'bg-white/20'}`}>
-                  <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform ${isConfigOpen ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                </div>
-                <span className="hidden sm:inline text-sm font-medium pr-2 text-white/90">Configuración</span>
-              </button>
-              
-              <AnimatePresence>
-                {isConfigOpen && (
-                  <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} transition={{ duration: 0.2 }} className="absolute top-full left-0 mt-3 w-64 liquid-glass rounded-2xl p-4 flex flex-col gap-3 shadow-2xl border border-white/10 z-50">
-                    <div className="flex items-center gap-3 p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div><span className="text-sm font-medium">Perfil</span></div>
-                    <div className="flex items-center gap-3 p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg></div><span className="text-sm font-medium">Notificaciones</span></div>
-                    <div className="w-full h-px bg-white/10 my-1"></div>
-                    <div onClick={handleCerrarSesion} className="flex items-center gap-3 p-2 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer transition-colors">
-                      <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                      </div>
-                      <span className="text-sm font-medium">Cerrar Sesión</span>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <button onClick={handleCerrarSesion} className="liquid-glass rounded-full px-4 py-2 flex items-center gap-2 hover:bg-white/80/20 hover:text-white/90 transition-colors cursor-pointer text-white/90">
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline text-sm font-medium pr-1">Cerrar Sesión</span>
+            </button>
           </div>
 
           <div className="liquid-glass rounded-full px-5 py-2 flex items-center gap-4 hidden md:flex">
             <span className="text-sm font-medium">Panel de Administración</span>
-            <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">Online</span>
+            
           </div>
 
           <div className="flex items-center gap-3 relative z-50">
@@ -343,7 +368,7 @@ const DashboardPage = () => {
               </button>
             </div>
             <button onClick={() => setIsSearchOpen(true)} className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/20 transition-colors">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <Search className="w-4 h-4 text-white" />
             </button>
           </div>
         </motion.header>
@@ -352,10 +377,10 @@ const DashboardPage = () => {
         <AnimatePresence>
           {isSearchOpen && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="fixed inset-0 z-[100] flex items-start justify-center pt-32 px-4 bg-black/20 backdrop-blur-3xl">
-              <div className="absolute inset-0 cursor-pointer" onClick={() => setIsSearchOpen(false)}></div>
+              <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => setIsSearchOpen(false)}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95, y: -20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -20 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-[calc(100%-2rem)] md:w-full max-w-2xl bg-white/10 liquid-glass-strong rounded-2xl overflow-hidden shadow-2xl border border-white/20 relative z-10 flex flex-col">
                 <div className="flex items-center px-4 py-4 border-b border-white/10">
-                  <svg className="w-6 h-6 text-white/50 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  <Search className="w-6 h-6 text-white/50 mr-3" />
                   <input type="text" autoFocus placeholder="Buscar eventos..." className="flex-1 bg-transparent border-none outline-none text-xl text-white placeholder-white/30 font-body" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                   <div className="hidden sm:block px-3 py-1 liquid-glass rounded-[0.4rem] text-[10px] text-white/70 font-heading tracking-widest border border-white/20 shadow-sm">ESC</div>
                 </div>
@@ -390,7 +415,7 @@ const DashboardPage = () => {
                   <div className="flex justify-between items-start">
                     <h3 className="text-xl font-heading italic text-white">Usuarios</h3>
                     <div className="w-10 h-10 rounded-full liquid-glass border border-white/20 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                      <svg className="w-5 h-5 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                      <Users className="w-5 h-5 text-white/80" />
                     </div>
                   </div>
                   <div className="mt-4">
@@ -407,7 +432,7 @@ const DashboardPage = () => {
                   <div className="flex justify-between items-start">
                     <h3 className="text-xl font-heading italic text-white">Eventos</h3>
                     <div className="w-10 h-10 rounded-full liquid-glass border border-white/20 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                      <svg className="w-5 h-5 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      <Calendar className="w-5 h-5 text-white/80" />
                     </div>
                   </div>
                   <div className="mt-4">
@@ -425,15 +450,15 @@ const DashboardPage = () => {
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white/70">Admin</span>
-                      <span className="font-semibold text-blue-400">{estadisticas.adminCount}</span>
+                      <span className="font-semibold text-white/90">{estadisticas.adminCount}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white/70">Organizador</span>
-                      <span className="font-semibold text-purple-400">{estadisticas.organizadorCount}</span>
+                      <span className="font-semibold text-white/90">{estadisticas.organizadorCount}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white/70">Asistente</span>
-                      <span className="font-semibold text-emerald-400">{estadisticas.asistenteCount}</span>
+                      <span className="font-semibold text-white/90">{estadisticas.asistenteCount}</span>
                     </div>
                   </div>
                 </div>
@@ -445,19 +470,19 @@ const DashboardPage = () => {
                     <div>
                       <div className="flex justify-between text-xs mb-1">
                         <span className="text-white/70">Online</span>
-                        <span className="font-semibold text-blue-400">{estadisticas.eventosOnline}</span>
+                        <span className="font-semibold text-white/90">{estadisticas.eventosOnline}</span>
                       </div>
                       <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500" style={{ width: `${(estadisticas.eventosOnline / estadisticas.totalEventos * 100) || 0}%` }}></div>
+                        <div className="h-full bg-white/80" style={{ width: `${(estadisticas.eventosOnline / estadisticas.totalEventos * 100) || 0}%` }}></div>
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between text-xs mb-1">
                         <span className="text-white/70">Presencial</span>
-                        <span className="font-semibold text-emerald-400">{estadisticas.eventosPresenciales}</span>
+                        <span className="font-semibold text-white/90">{estadisticas.eventosPresenciales}</span>
                       </div>
                       <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500" style={{ width: `${(estadisticas.eventosPresenciales / estadisticas.totalEventos * 100) || 0}%` }}></div>
+                        <div className="h-full bg-white/80" style={{ width: `${(estadisticas.eventosPresenciales / estadisticas.totalEventos * 100) || 0}%` }}></div>
                       </div>
                     </div>
                   </div>
@@ -468,14 +493,14 @@ const DashboardPage = () => {
                   <h3 className="text-xl font-heading italic text-white mb-4">Actividad (7 días)</h3>
                   <div className="space-y-3 flex-1">
                     <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                      <Users className="w-5 h-5 text-white" />
                       <div>
                         <div className="text-xs text-white/70">Usuarios nuevos</div>
                         <div className="text-lg font-semibold text-white">{estadisticas.usuariosUltimosDias}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.12-2.59-4.04 5.09h15.5L9.96 6.5z"/></svg>
+                      <Activity className="w-5 h-5 text-white" />
                       <div>
                         <div className="text-xs text-white/70">Eventos actualizados</div>
                         <div className="text-lg font-semibold text-white">{estadisticas.eventosUltimosDias}</div>
@@ -494,7 +519,7 @@ const DashboardPage = () => {
                       .map(([cat, count]) => (
                         <div key={cat} className="flex items-center justify-between">
                           <span className="text-white/70 truncate">{cat}</span>
-                          <span className="font-semibold text-cyan-400">{count}</span>
+                          <span className="font-semibold text-white/90">{count}</span>
                         </div>
                       ))
                     }
@@ -508,19 +533,19 @@ const DashboardPage = () => {
                     <div>
                       <div className="flex justify-between text-xs mb-1">
                         <span className="text-white/70">Activos</span>
-                        <span className="font-semibold text-emerald-400">{estadisticas.usuariosActivos}</span>
+                        <span className="font-semibold text-white/90">{estadisticas.usuariosActivos}</span>
                       </div>
                       <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500" style={{ width: `${(estadisticas.usuariosActivos / estadisticas.totalUsuarios * 100) || 0}%` }}></div>
+                        <div className="h-full bg-white/80" style={{ width: `${(estadisticas.usuariosActivos / estadisticas.totalUsuarios * 100) || 0}%` }}></div>
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between text-xs mb-1">
                         <span className="text-white/70">Inactivos</span>
-                        <span className="font-semibold text-red-400">{estadisticas.totalUsuarios - estadisticas.usuariosActivos}</span>
+                        <span className="font-semibold text-white/90">{estadisticas.totalUsuarios - estadisticas.usuariosActivos}</span>
                       </div>
                       <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-red-500" style={{ width: `${((estadisticas.totalUsuarios - estadisticas.usuariosActivos) / estadisticas.totalUsuarios * 100) || 0}%` }}></div>
+                        <div className="h-full bg-white/80" style={{ width: `${((estadisticas.totalUsuarios - estadisticas.usuariosActivos) / estadisticas.totalUsuarios * 100) || 0}%` }}></div>
                       </div>
                     </div>
                   </div>
@@ -531,15 +556,15 @@ const DashboardPage = () => {
                   <h3 className="text-xl font-heading italic text-white mb-4">Sistema</h3>
                   <div className="space-y-3 flex-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse"></div>
                       <span className="text-xs text-white/70">Firebase Activo</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse"></div>
                       <span className="text-xs text-white/70">Sincronización OK</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse"></div>
                       <span className="text-xs text-white/70">Conexión Estable</span>
                     </div>
                   </div>
@@ -554,7 +579,7 @@ const DashboardPage = () => {
                   {[1, 2, 3, 4, 5].map((item) => (
                     <div key={item} className="liquid-glass border border-white/5 rounded-xl p-4 flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer">
                       <div className="flex items-center gap-4">
-                        <LiquidAvatar colorClass="text-purple-400" size="w-12 h-12" border="border" />
+                        <LiquidAvatar colorClass="text-white/90" size="w-12 h-12" border="border" />
                         <div>
                           <div className="font-medium">Comunidad Tech {item}</div>
                           <div className="text-sm text-white/50">{120 * item} Miembros activos</div>
@@ -575,7 +600,7 @@ const DashboardPage = () => {
           {/* MODAL: LISTA DE EVENTOS */}
           {activeModal === 'eventsList' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
-              <div className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal(null)}></div>
+              <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal(null)}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-4xl liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl h-[80vh] flex flex-col">
                 <div className="flex justify-between items-center mb-6 shrink-0 border-b border-white/10 pb-4">
                   <div>
@@ -590,18 +615,8 @@ const DashboardPage = () => {
 
                 <div className="flex gap-4 mb-4 shrink-0 flex-wrap">
                   <input type="text" placeholder="Filtrar por título..." value={filtroTextoEventos} onChange={e => setFiltroTextoEventos(e.target.value)} className="flex-1 min-w-[200px] bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none placeholder-white/40" />
-                  <select value={filtroModalidad} onChange={e => setFiltroModalidad(e.target.value)} className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="todas">Todas</option>
-                    <option className="bg-slate-900" value="online">Online</option>
-                    <option className="bg-slate-900" value="presencial">Presencial</option>
-                  </select>
-                  <select value={filtroCategoriaEventos} onChange={e => setFiltroCategoriaEventos(e.target.value)} className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="todas">Todas las Categorías</option>
-                    <option className="bg-slate-900" value="inteligencia">IA</option>
-                    <option className="bg-slate-900" value="conferencia">Conferencia</option>
-                    <option className="bg-slate-900" value="web">Web</option>
-                    <option className="bg-slate-900" value="mobile">Mobile</option>
-                  </select>
+                  <CustomSelect value={filtroModalidad} onChange={setFiltroModalidad} options={[{value: 'todas', label: 'Todas'}, {value: 'online', label: 'Online'}, {value: 'presencial', label: 'Presencial'}]} />
+                  <CustomSelect value={filtroCategoriaEventos} onChange={setFiltroCategoriaEventos} options={[{value: 'todas', label: 'Todas las Categorías'}, {value: 'inteligencia', label: 'IA'}, {value: 'conferencia', label: 'Conferencia'}, {value: 'web', label: 'Web'}, {value: 'mobile', label: 'Mobile'}, {value: 'hackathon', label: 'Hackathon'}]} />
                 </div>
 
                 <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide space-y-2">
@@ -617,8 +632,8 @@ const DashboardPage = () => {
                           </div>
                         </div>
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => { setEditingEvent(ev); setActiveModal('editEvent'); }} className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs font-medium">Editar</button>
-                          <button onClick={() => handleBorrarEvento(ev.id)} className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium">Eliminar</button>
+                          <button onClick={() => { setEditingEvent(ev); setActiveModal('editEvent'); }} className="px-3 py-1.5 rounded-lg bg-white/80/20 hover:bg-white/80/30 text-blue-300 text-xs font-medium">Editar</button>
+                          <button onClick={() => handleBorrarEvento(ev.id)} className="px-3 py-1.5 rounded-lg bg-white/80/10 hover:bg-white/80/20 text-white/90 text-xs font-medium">Eliminar</button>
                         </div>
                       </div>
                     ))
@@ -631,7 +646,7 @@ const DashboardPage = () => {
           {/* MODAL: CREAR/EDITAR EVENTO */}
           {(activeModal === 'newEvent' || activeModal === 'editEvent') && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-              <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveModal('eventsList'); setEditingEvent(null); }}></div>
+              <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => { setActiveModal('eventsList'); setEditingEvent(null); }}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-heading italic text-white">{editingEvent ? 'Editar Evento' : 'Desplegar Nuevo Evento'}</h3>
@@ -648,17 +663,8 @@ const DashboardPage = () => {
                     <input type="text" value={editingEvent ? editingEvent.horaFin : formDataEvento.horaFin} onChange={e => editingEvent ? setEditingEvent({...editingEvent, horaFin: e.target.value}) : setFormDataEvento({...formDataEvento, horaFin: e.target.value})} placeholder="Hora fin" className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none placeholder-white/40" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <select value={editingEvent ? (editingEvent.isOnline ? 'true' : 'false') : formDataEvento.isOnline} onChange={e => editingEvent ? setEditingEvent({...editingEvent, isOnline: e.target.value}) : setFormDataEvento({...formDataEvento, isOnline: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                      <option className="bg-slate-900" value="false">Presencial</option>
-                      <option className="bg-slate-900" value="true">Virtual</option>
-                    </select>
-                    <select value={editingEvent ? editingEvent.categoria : formDataEvento.categoria} onChange={e => editingEvent ? setEditingEvent({...editingEvent, categoria: e.target.value}) : setFormDataEvento({...formDataEvento, categoria: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                      <option className="bg-slate-900" value="inteligencia artificial">IA</option>
-                      <option className="bg-slate-900" value="web">Web</option>
-                      <option className="bg-slate-900" value="mobile">Mobile</option>
-                      <option className="bg-slate-900" value="conferencia">Conferencia</option>
-                      <option className="bg-slate-900" value="hackathon">Hackathon</option>
-                    </select>
+                    <CustomSelect value={editingEvent ? (editingEvent.isOnline ? 'true' : 'false') : formDataEvento.isOnline} onChange={v => editingEvent ? setEditingEvent({...editingEvent, isOnline: v}) : setFormDataEvento({...formDataEvento, isOnline: v})} options={[{value: 'false', label: 'Presencial'}, {value: 'true', label: 'Virtual'}]} />
+                    <CustomSelect value={editingEvent ? editingEvent.categoria : formDataEvento.categoria} onChange={v => editingEvent ? setEditingEvent({...editingEvent, categoria: v}) : setFormDataEvento({...formDataEvento, categoria: v})} options={[{value: 'inteligencia artificial', label: 'IA'}, {value: 'web', label: 'Web'}, {value: 'mobile', label: 'Mobile'}, {value: 'conferencia', label: 'Conferencia'}, {value: 'hackathon', label: 'Hackathon'}]} />
                   </div>
                   <input required type="text" value={editingEvent ? editingEvent.ubicacion : formDataEvento.ubicacion} onChange={e => editingEvent ? setEditingEvent({...editingEvent, ubicacion: e.target.value}) : setFormDataEvento({...formDataEvento, ubicacion: e.target.value})} placeholder="Ubicación o URL de Meet" className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none placeholder-white/40" />
                   <input type="text" value={editingEvent ? editingEvent.imagenUrl : formDataEvento.imagenUrl} onChange={e => editingEvent ? setEditingEvent({...editingEvent, imagenUrl: e.target.value}) : setFormDataEvento({...formDataEvento, imagenUrl: e.target.value})} placeholder="URL de la imagen (Cover)" className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none placeholder-white/40" />
@@ -672,7 +678,7 @@ const DashboardPage = () => {
           {/* MODAL: LISTA DE USUARIOS */}
           {activeModal === 'usersList' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
-              <div className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal(null)}></div>
+              <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal(null)}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-4xl liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl h-[80vh] flex flex-col">
                 
                 <div className="flex justify-between items-center mb-6 shrink-0 border-b border-white/10 pb-4">
@@ -681,24 +687,15 @@ const DashboardPage = () => {
                     <p className="text-xs text-white/50">Firebase Authentication - {estadisticas.totalUsuarios} usuarios</p>
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => { setFormDataUsuario({ email: '', rol: 'MIEMBRO', estado: 'Activo' }); setActiveModal('newUser'); }} className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white font-bold text-sm rounded-xl transition-colors">+ Añadir Usuario</button>
+                    <button onClick={() => { setFormDataUsuario({ email: '', rol: 'MIEMBRO', estado: 'Activo' }); setActiveModal('newUser'); }} className="px-4 py-2 bg-white/80 hover:bg-blue-400 text-white font-bold text-sm rounded-xl transition-colors">+ Añadir Usuario</button>
                     <button onClick={() => setActiveModal(null)} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">✕</button>
                   </div>
                 </div>
 
                 <div className="flex gap-4 mb-4 shrink-0 flex-wrap">
                   <input type="text" placeholder="Buscar por correo..." value={filtroTextoUsuarios} onChange={e => setFiltroTextoUsuarios(e.target.value)} className="flex-1 min-w-[200px] bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none placeholder-white/40" />
-                  <select value={filtroRol} onChange={e => setFiltroRol(e.target.value)} className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="todos">Todos los Roles</option>
-                    <option className="bg-slate-900" value="ADMINISTRADOR">Administradores</option>
-                    <option className="bg-slate-900" value="ORGANIZADOR">Organizadores</option>
-                    <option className="bg-slate-900" value="ASISTENTE">Asistentes</option>
-                  </select>
-                  <select value={filtroEstado} onChange={e => setFiltroEstado(e.target.value)} className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="todos">Todos los Estados</option>
-                    <option className="bg-slate-900" value="Activo">Activos</option>
-                    <option className="bg-slate-900" value="Inactivo">Inactivos</option>
-                  </select>
+                  <CustomSelect value={filtroRol} onChange={setFiltroRol} options={[{value: 'todos', label: 'Todos los Roles'}, {value: 'MIEMBRO', label: 'Miembro'}, {value: 'ORGANIZADOR', label: 'Organizador'}, {value: 'ADMINISTRADOR', label: 'Administrador'}, {value: 'ASISTENTE', label: 'Asistente'}]} />
+                  <CustomSelect value={filtroEstado} onChange={setFiltroEstado} options={[{value: 'todos', label: 'Todos los Estados'}, {value: 'Activo', label: 'Activo'}, {value: 'Inactivo', label: 'Inactivo'}]} />
                 </div>
 
                 <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex-1 flex flex-col">
@@ -713,7 +710,7 @@ const DashboardPage = () => {
                       usuariosFiltrados.map((u) => (
                         <div key={u.id} className="grid grid-cols-12 gap-4 p-4 border-b border-white/5 items-center hover:bg-white/5 transition-colors group">
                           <div className="col-span-5 flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold border border-blue-500/30 text-xs">
+                            <div className="w-8 h-8 rounded-full bg-white/80/20 text-white/90 flex items-center justify-center font-bold border border-blue-500/30 text-xs">
                               {u.email ? u.email[0].toUpperCase() : 'U'}
                             </div>
                             <span className="text-sm font-medium truncate">{u.email}</span>
@@ -724,7 +721,7 @@ const DashboardPage = () => {
                             </span>
                           </div>
                           <div className="col-span-4 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleBorrarUsuario(u.id)} className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium">Banear</button>
+                            <button onClick={() => handleBorrarUsuario(u.id)} className="px-3 py-1.5 rounded-lg bg-white/80/10 hover:bg-white/80/20 text-white/90 text-xs font-medium">Banear</button>
                           </div>
                         </div>
                       ))
@@ -738,7 +735,7 @@ const DashboardPage = () => {
           {/* MODAL: CREAR USUARIO */}
           {activeModal === 'newUser' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-              <div className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal('usersList')}></div>
+              <motion.div exit={{ opacity: 0 }} className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal('usersList')}></motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-heading italic text-white">Añadir Cuenta</h3>
@@ -746,16 +743,9 @@ const DashboardPage = () => {
                 </div>
                 <form className="flex flex-col gap-4" onSubmit={handleCrearUsuario}>
                   <input required type="email" value={formDataUsuario.email} onChange={e => setFormDataUsuario({...formDataUsuario, email: e.target.value})} placeholder="correo@ejemplo.com" className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none placeholder-white/40" />
-                  <select value={formDataUsuario.rol} onChange={e => setFormDataUsuario({...formDataUsuario, rol: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="ADMINISTRADOR">ADMINISTRADOR</option>
-                    <option className="bg-slate-900" value="ORGANIZADOR">ORGANIZADOR</option>
-                    <option className="bg-slate-900" value="ASISTENTE">MIEMBRO</option>
-                  </select>
-                  <select value={formDataUsuario.estado} onChange={e => setFormDataUsuario({...formDataUsuario, estado: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="Activo">Activo</option>
-                    <option className="bg-slate-900" value="Inactivo">Inactivo</option>
-                  </select>
-                  <button type="submit" className="w-full bg-blue-500 text-white font-bold rounded-xl py-3 hover:bg-blue-400 mt-2 transition-colors">Registrar Perfil</button>
+                  <CustomSelect value={formDataUsuario.rol} onChange={v => setFormDataUsuario({...formDataUsuario, rol: v})} options={[{value: 'MIEMBRO', label: 'Miembro'}, {value: 'ORGANIZADOR', label: 'Organizador'}, {value: 'ADMINISTRADOR', label: 'Administrador'}, {value: 'ASISTENTE', label: 'Asistente'}]} />
+                  <CustomSelect value={formDataUsuario.estado} onChange={v => setFormDataUsuario({...formDataUsuario, estado: v})} options={[{value: 'Activo', label: 'Activo'}, {value: 'Inactivo', label: 'Inactivo'}]} />
+                  <button type="submit" className="w-full bg-white/80 text-white font-bold rounded-xl py-3 hover:bg-blue-400 mt-2 transition-colors">Registrar Perfil</button>
                 </form>
               </motion.div>
             </motion.div>

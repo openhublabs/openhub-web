@@ -5,7 +5,6 @@ import { auth } from './firebase';
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -55,11 +54,6 @@ const App = () => {
           element={!isLoggedIn ? <LoginPage /> : <Navigate to="/dashboard" />} 
         />
         
-        <Route 
-          path="/register" 
-          element={!isLoggedIn ? <RegisterPage /> : <Navigate to="/dashboard" />} 
-        />
-
         <Route 
           path="/dashboard" 
           element={isLoggedIn ? <DashboardPage /> : <Navigate to="/login" />} 

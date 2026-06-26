@@ -10,7 +10,6 @@ const Navbar = () => {
       
       <div className="hidden lg:flex liquid-glass rounded-full px-1.5 py-1.5 items-center">
         <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Inicio</a>
-        <a href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">Usuarios</a>
         
         {/* Cambiado de "Admin" a "Login" para cumplir con el estándar UX */}
         <button 

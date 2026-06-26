@@ -1,3 +1,4 @@
+/* eslint-disable */
 const API_URL = 'http://localhost:5000/api';
 
 // 1. LEER TODOS LOS USUARIOS (Directo de Authentication)
