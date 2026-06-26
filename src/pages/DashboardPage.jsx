@@ -171,7 +171,7 @@ const DashboardPage = () => {
         isOnline: formDataEvento.isOnline === 'true',
         clips: 0
       });
-      cargarEventos();
+      cargarEventEventos();
       setFormDataEvento({
         titulo: '', organizador: '', categoria: 'inteligencia artificial', fecha: '',
         horaInicio: '', horaFin: '', isOnline: 'false', ubicacion: '', imagenUrl: '',
