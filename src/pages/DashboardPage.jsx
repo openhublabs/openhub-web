@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import FadingVideo from '../components/ui/FadingVideo';
 import { obtenerEventos, crearEvento, borrarEvento, actualizarEvento } from '../services/EventosService';
 import { obtenerUsuarios, crearUsuario, borrarUsuario, actualizarUsuario } from '../services/usuariosService';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -67,7 +69,18 @@ const DashboardPage = () => {
     usuariosUltimosDias: 0,
     eventosUltimosDias: 0
   });
-
+// ==========================================
+  // LÓGICA DE CERRAR SESIÓN
+  // ==========================================
+  const handleCerrarSesion = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login'); // Te manda al login tras cerrar sesión con éxito
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      alert("Error al cerrar sesión: " + error.message);
+    }
+  };
   // ==========================================
   // CARGAR EVENTOS
   // ==========================================
@@ -329,7 +342,17 @@ const DashboardPage = () => {
                     <div className="flex items-center gap-3 p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div><span className="text-sm font-medium">Perfil</span></div>
                     <div className="flex items-center gap-3 p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg></div><span className="text-sm font-medium">Notificaciones</span></div>
                     <div className="w-full h-px bg-white/10 my-1"></div>
-                    <div className="flex items-center gap-3 p-2 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></div><span className="text-sm font-medium">Cerrar Sesión</span></div>
+                   <div 
+                      onClick={handleCerrarSesion} 
+                      className="flex items-center gap-3 p-2 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                      </div>
+                      <span className="text-sm font-medium">Cerrar Sesión</span>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -343,10 +366,6 @@ const DashboardPage = () => {
 
           <div className="flex items-center gap-3 relative z-50">
             <div className="liquid-glass rounded-full p-1.5 flex items-center relative">
-              <button onClick={() => setActiveTab('directorio')} className={`relative px-3 py-1.5 md:px-4 text-xs md:text-sm font-medium transition-colors ${activeTab === 'directorio' ? 'text-black' : 'text-white/80 hover:text-white'}`}>
-                {activeTab === 'directorio' && <motion.div layoutId="navPill" className="absolute inset-0 bg-white rounded-full shadow-sm" transition={{ type: "spring", stiffness: 300, damping: 25 }} />}
-                <span className="relative z-10">Directorio</span>
-              </button>
               <button onClick={() => setActiveTab('dashboard')} className={`relative px-3 py-1.5 md:px-4 text-xs md:text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-black' : 'text-white/80 hover:text-white'}`}>
                 {activeTab === 'dashboard' && <motion.div layoutId="navPill" className="absolute inset-0 bg-white rounded-full shadow-sm" transition={{ type: "spring", stiffness: 300, damping: 25 }} />}
                 <span className="relative z-10">Dashboard</span>
@@ -579,22 +598,7 @@ const DashboardPage = () => {
           </AnimatePresence>
         </div>
 
-        {/* === BOTTOM DOCK === */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }} className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 liquid-glass-strong rounded-full px-2 py-2 flex items-center gap-2 md:gap-4 z-50 scale-90 md:scale-100 origin-bottom">
-          <div className="flex items-center pl-2">
-            <div className="flex space-x-2">
-              <LiquidAvatar colorClass="text-slate-400" size="w-10 h-10" />
-              <LiquidAvatar colorClass="text-pink-400" size="w-10 h-10" />
-              <LiquidAvatar colorClass="text-emerald-400" size="w-10 h-10" />
-            </div>
-            <div className="w-10 h-10 rounded-full liquid-glass border-2 border-white/10 flex items-center justify-center text-xs font-medium ml-2 shadow-sm">+{Math.max(0, usuarios.length - 3)}</div>
-          </div>
-          <div className="w-px h-8 bg-white/20 mx-2"></div>
-          <div className="flex gap-2 pr-2">
-            <button className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/20 transition-colors"><svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></button>
-            <button className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/20 transition-colors"><svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg></button>
-          </div>
-        </motion.div>
+
 
         {/* ========= MODALES ========= */}
         <AnimatePresence>

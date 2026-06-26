@@ -1,7 +1,7 @@
 import { 
   collection, 
   getDocs, 
-  addDoc, 
+  setDoc, 
   deleteDoc, 
   doc, 
   serverTimestamp,
@@ -31,13 +31,17 @@ export const obtenerUsuarios = async () => {
 // 2. CREAR UN NUEVO USUARIO
 export const crearUsuario = async (nuevoUsuario) => {
   try {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-      ...nuevoUsuario,
+    const docRef = doc(db, COLLECTION_NAME, nuevoUsuario.id);
+
+    await setDoc(docRef, {
+      email: nuevoUsuario.email,
+      rol: nuevoUsuario.rol || 'ADMINISTRADOR',
+      estado: nuevoUsuario.estado || 'Activo',
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      estado: 'Activo'
+      updatedAt: serverTimestamp()
     });
-    return docRef.id;
+    
+    return nuevoUsuario.id;
   } catch (error) {
     console.error("Error al crear usuario:", error);
     throw error;

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
+import { crearUsuario } from '../services/usuariosService';
 
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -28,7 +29,21 @@ export default function RegisterPage() {
         setError('');
 
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
+            // 1. Crea la cuenta en Firebase Authentication y nos da el UID
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // 2. Guarda al usuario en Firestore automáticamente como ADMINISTRADOR
+            await crearUsuario({
+                id: user.uid, 
+                email: user.email,
+                rol: 'ADMINISTRADOR', 
+                estado: 'Activo',
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+
+            // 3. Te manda al dashboard con el contador actualizado
             navigate('/dashboard');
         } catch (err) {
             console.error('Firebase Auth Error:', err);
