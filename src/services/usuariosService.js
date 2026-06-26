@@ -11,15 +11,14 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
  
-const COLLECTION_NAME = "usuarios"; // Colección para usuario profiles
+const COLLECTION_NAME = "usuarios";
  
-// 1. LEER TODOS LOS USUARIOS
 export const obtenerUsuarios = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
     const usuarios = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
+      ...doc.data(),
+      id: doc.id
     }));
     return usuarios;
   } catch (error) {
@@ -28,14 +27,12 @@ export const obtenerUsuarios = async () => {
   }
 };
  
-// 2. CREAR UN NUEVO USUARIO
 export const crearUsuario = async (nuevoUsuario) => {
   try {
     const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       ...nuevoUsuario,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      estado: 'Activo'
+      updatedAt: serverTimestamp()
     });
     return docRef.id;
   } catch (error) {
@@ -44,7 +41,6 @@ export const crearUsuario = async (nuevoUsuario) => {
   }
 };
  
-// 3. ACTUALIZAR UN USUARIO
 export const actualizarUsuario = async (idUsuario, usuarioActualizado) => {
   try {
     await updateDoc(doc(db, COLLECTION_NAME, idUsuario), {
@@ -58,7 +54,6 @@ export const actualizarUsuario = async (idUsuario, usuarioActualizado) => {
   }
 };
  
-// 4. ELIMINAR UN USUARIO
 export const borrarUsuario = async (idUsuario) => {
   try {
     await deleteDoc(doc(db, COLLECTION_NAME, idUsuario));
@@ -69,14 +64,13 @@ export const borrarUsuario = async (idUsuario) => {
   }
 };
  
-// 5. OBTENER USUARIOS POR ROL
 export const obtenerUsuariosPorRol = async (rol) => {
   try {
     const q = query(collection(db, COLLECTION_NAME), where("rol", "==", rol));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
+      ...doc.data(),
+      id: doc.id
     }));
   } catch (error) {
     console.error("Error al obtener usuarios por rol:", error);

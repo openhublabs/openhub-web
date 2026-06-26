@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import FadingVideo from '../components/ui/FadingVideo';
 import { obtenerEventos, crearEvento, borrarEvento, actualizarEvento } from '../services/EventosService';
 import { obtenerUsuarios, crearUsuario, borrarUsuario, actualizarUsuario } from '../services/usuariosService';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const DashboardPage = () => {
   // === ESTADOS PARA MODALES ===
   const [activeModal, setActiveModal] = useState(null);
 
-  // === ESTADOS PARA EVENTOS (FIREBASE REAL) ===
+  // === ESTADOS PARA EVENTOS ===
   const [eventos, setEventos] = useState([]);
   const [isLoadingEventos, setIsLoadingEventos] = useState(true);
   const [filtroTextoEventos, setFiltroTextoEventos] = useState('');
@@ -38,7 +40,7 @@ const DashboardPage = () => {
     tags: []
   });
 
-  // === ESTADOS PARA USUARIOS (FIREBASE REAL) ===
+  // === ESTADOS PARA USUARIOS ===
   const [usuarios, setUsuarios] = useState([]);
   const [isLoadingUsuarios, setIsLoadingUsuarios] = useState(true);
   const [filtroTextoUsuarios, setFiltroTextoUsuarios] = useState('');
@@ -48,7 +50,7 @@ const DashboardPage = () => {
 
   const [formDataUsuario, setFormDataUsuario] = useState({
     email: '',
-    rol: 'ASISTENTE',
+    rol: 'MIEMBRO',
     estado: 'Activo'
   });
 
@@ -67,6 +69,19 @@ const DashboardPage = () => {
     usuariosUltimosDias: 0,
     eventosUltimosDias: 0
   });
+
+  // ==========================================
+  // LÓGICA DE CERRAR SESIÓN
+  // ==========================================
+  const handleCerrarSesion = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      alert("Error al cerrar sesión: " + error.message);
+    }
+  };
 
   // ==========================================
   // CARGAR EVENTOS
@@ -89,23 +104,20 @@ const DashboardPage = () => {
   };
 
   // ==========================================
-  // CALCULAR ESTADÍSTICAS
+  // CALCULAR ESTADÍSTICAS (ADAPTADO A AUTH)
   // ==========================================
   const calcularEstadisticas = () => {
     const ahora = new Date();
     const hace7Dias = new Date(ahora.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // Contar usuarios
     const adminCount = usuarios.filter(u => u.rol === 'ADMINISTRADOR').length;
     const organizadorCount = usuarios.filter(u => u.rol === 'ORGANIZADOR').length;
     const asistenteCount = usuarios.filter(u => u.rol === 'ASISTENTE').length;
     const usuariosActivos = usuarios.filter(u => u.estado === 'Activo').length;
 
-    // Contar eventos
     const eventosOnline = eventos.filter(e => e.isOnline === true).length;
     const eventosPresenciales = eventos.filter(e => e.isOnline === false).length;
 
-    // Eventos por categoría
     const eventosPorCategoria = {};
     eventos.forEach(e => {
       const cat = e.categoria || 'Sin categoría';
@@ -124,12 +136,14 @@ const DashboardPage = () => {
       asistenteCount,
       eventosPorCategoria,
       usuariosUltimosDias: usuarios.filter(u => {
-        const createdAt = u.createdAt?.toDate?.() || new Date();
-        return createdAt > hace7Dias;
+        if (!u.createdAt) return true;
+        const fechaUser = new Date(u.createdAt);
+        return fechaUser > hace7Dias;
       }).length,
       eventosUltimosDias: eventos.filter(e => {
-        const updatedAt = e.updatedAt?.toDate?.() || new Date();
-        return updatedAt > hace7Dias;
+        if (!e.updatedAt) return true;
+        const createdAt = e.updatedAt?.toDate?.() || new Date();
+        return createdAt > hace7Dias;
       }).length
     });
   };
@@ -142,7 +156,6 @@ const DashboardPage = () => {
     cargarUsuarios();
   }, []);
 
-  // Recalcular estadísticas cuando cambien eventos o usuarios
   useEffect(() => {
     calcularEstadisticas();
   }, [eventos, usuarios]);
@@ -160,17 +173,9 @@ const DashboardPage = () => {
       });
       cargarEventos();
       setFormDataEvento({
-        titulo: '',
-        organizador: '',
-        categoria: 'inteligencia artificial',
-        fecha: '',
-        horaInicio: '',
-        horaFin: '',
-        isOnline: 'false',
-        ubicacion: '',
-        imagenUrl: '',
-        descripcion: '',
-        tags: []
+        titulo: '', organizador: '', categoria: 'inteligencia artificial', fecha: '',
+        horaInicio: '', horaFin: '', isOnline: 'false', ubicacion: '', imagenUrl: '',
+        descripcion: '', tags: []
       });
       setActiveModal('eventsList');
     } catch (error) {
@@ -216,7 +221,7 @@ const DashboardPage = () => {
     try {
       await crearUsuario(formDataUsuario);
       cargarUsuarios();
-      setFormDataUsuario({ email: '', rol: 'ASISTENTE', estado: 'Activo' });
+      setFormDataUsuario({ email: '', rol: 'MIEMBRO', estado: 'Activo' });
       setActiveModal('usersList');
     } catch (error) {
       alert("Error al crear usuario: " + error.message);
@@ -246,9 +251,7 @@ const DashboardPage = () => {
     }
   };
 
-  // ==========================================
-  // FILTRADOS
-  // ==========================================
+  // === FILTRADOS ===
   const eventosFiltrados = eventos.filter(ev => {
     const titulo = (ev.titulo || '').toLowerCase();
     const organizador = (ev.organizador || '').toLowerCase();
@@ -275,28 +278,12 @@ const DashboardPage = () => {
     return matchTexto && matchRol && matchEstado;
   });
 
-  // ==========================================
-  // COMPONENTES REUTILIZABLES
-  // ==========================================
+  // === COMPONENTES INTERNOS ===
   const LiquidAvatar = ({ size = "w-8 h-8", border = "border-2", colorClass = "text-white" }) => (
     <div className={`${size} rounded-full liquid-glass ${border} border-white/30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.3)] relative overflow-hidden flex items-center justify-center`}>
       <svg className={`w-[120%] h-[120%] ${colorClass} relative z-10 translate-y-[10%]`} viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
       </svg>
-    </div>
-  );
-
-  const StatCard = ({ label, value, icon, color = "blue" }) => (
-    <div className={`liquid-glass rounded-[1.75rem] p-6 flex flex-col justify-between cursor-pointer hover:bg-white/5 transition-colors group border border-white/5`}>
-      <div className="flex justify-between items-start">
-        <h3 className="text-sm font-medium text-white/70">{label}</h3>
-        <div className={`w-10 h-10 rounded-full liquid-glass border border-${color}-400/30 flex items-center justify-center group-hover:bg-${color}-400/10 transition-colors`}>
-          {icon}
-        </div>
-      </div>
-      <div className="mt-4">
-        <span className="text-3xl font-light text-white">{value}</span>
-      </div>
     </div>
   );
 
@@ -329,7 +316,14 @@ const DashboardPage = () => {
                     <div className="flex items-center gap-3 p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div><span className="text-sm font-medium">Perfil</span></div>
                     <div className="flex items-center gap-3 p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg></div><span className="text-sm font-medium">Notificaciones</span></div>
                     <div className="w-full h-px bg-white/10 my-1"></div>
-                    <div className="flex items-center gap-3 p-2 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer transition-colors"><div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></div><span className="text-sm font-medium">Cerrar Sesión</span></div>
+                    <div onClick={handleCerrarSesion} className="flex items-center gap-3 p-2 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                      </div>
+                      <span className="text-sm font-medium">Cerrar Sesión</span>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -343,10 +337,6 @@ const DashboardPage = () => {
 
           <div className="flex items-center gap-3 relative z-50">
             <div className="liquid-glass rounded-full p-1.5 flex items-center relative">
-              <button onClick={() => setActiveTab('directorio')} className={`relative px-3 py-1.5 md:px-4 text-xs md:text-sm font-medium transition-colors ${activeTab === 'directorio' ? 'text-black' : 'text-white/80 hover:text-white'}`}>
-                {activeTab === 'directorio' && <motion.div layoutId="navPill" className="absolute inset-0 bg-white rounded-full shadow-sm" transition={{ type: "spring", stiffness: 300, damping: 25 }} />}
-                <span className="relative z-10">Directorio</span>
-              </button>
               <button onClick={() => setActiveTab('dashboard')} className={`relative px-3 py-1.5 md:px-4 text-xs md:text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'text-black' : 'text-white/80 hover:text-white'}`}>
                 {activeTab === 'dashboard' && <motion.div layoutId="navPill" className="absolute inset-0 bg-white rounded-full shadow-sm" transition={{ type: "spring", stiffness: 300, damping: 25 }} />}
                 <span className="relative z-10">Dashboard</span>
@@ -579,23 +569,6 @@ const DashboardPage = () => {
           </AnimatePresence>
         </div>
 
-        {/* === BOTTOM DOCK === */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }} className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 liquid-glass-strong rounded-full px-2 py-2 flex items-center gap-2 md:gap-4 z-50 scale-90 md:scale-100 origin-bottom">
-          <div className="flex items-center pl-2">
-            <div className="flex space-x-2">
-              <LiquidAvatar colorClass="text-slate-400" size="w-10 h-10" />
-              <LiquidAvatar colorClass="text-pink-400" size="w-10 h-10" />
-              <LiquidAvatar colorClass="text-emerald-400" size="w-10 h-10" />
-            </div>
-            <div className="w-10 h-10 rounded-full liquid-glass border-2 border-white/10 flex items-center justify-center text-xs font-medium ml-2 shadow-sm">+{Math.max(0, usuarios.length - 3)}</div>
-          </div>
-          <div className="w-px h-8 bg-white/20 mx-2"></div>
-          <div className="flex gap-2 pr-2">
-            <button className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/20 transition-colors"><svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></button>
-            <button className="w-10 h-10 rounded-full liquid-glass flex items-center justify-center hover:bg-white/20 transition-colors"><svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg></button>
-          </div>
-        </motion.div>
-
         {/* ========= MODALES ========= */}
         <AnimatePresence>
 
@@ -661,7 +634,7 @@ const DashboardPage = () => {
               <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveModal('eventsList'); setEditingEvent(null); }}></div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-heading italic text-white">{editingEvent ? 'Editar Evento' : 'Desplegar Nuevo Evento'}</h3>
+                  <h3 className="text-xl font-heading italic text-white">{editingEvent ? 'Editar Evento' : 'Desplegar Nuevo Evento'}</h3>
                   <button onClick={() => { setActiveModal('eventsList'); setEditingEvent(null); }} className="text-xs text-white/50 hover:text-white">← Volver</button>
                 </div>
                 <form className="flex flex-col gap-4" onSubmit={editingEvent ? handleActualizarEvento : handleCrearEvento}>
@@ -705,10 +678,10 @@ const DashboardPage = () => {
                 <div className="flex justify-between items-center mb-6 shrink-0 border-b border-white/10 pb-4">
                   <div>
                     <h3 className="text-2xl font-heading italic text-white">Directorio de Accesos</h3>
-                    <p className="text-xs text-white/50">Firestore - {estadisticas.totalUsuarios} usuarios</p>
+                    <p className="text-xs text-white/50">Firebase Authentication - {estadisticas.totalUsuarios} usuarios</p>
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => { setFormDataUsuario({ email: '', rol: 'ASISTENTE', estado: 'Activo' }); setActiveModal('newUser'); }} className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white font-bold text-sm rounded-xl transition-colors">+ Añadir Usuario</button>
+                    <button onClick={() => { setFormDataUsuario({ email: '', rol: 'MIEMBRO', estado: 'Activo' }); setActiveModal('newUser'); }} className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white font-bold text-sm rounded-xl transition-colors">+ Añadir Usuario</button>
                     <button onClick={() => setActiveModal(null)} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">✕</button>
                   </div>
                 </div>
@@ -740,12 +713,17 @@ const DashboardPage = () => {
                       usuariosFiltrados.map((u) => (
                         <div key={u.id} className="grid grid-cols-12 gap-4 p-4 border-b border-white/5 items-center hover:bg-white/5 transition-colors group">
                           <div className="col-span-5 flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold border border-blue-500/30 text-xs">{u.email[0].toUpperCase()}</div>
+                            <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold border border-blue-500/30 text-xs">
+                              {u.email ? u.email[0].toUpperCase() : 'U'}
+                            </div>
                             <span className="text-sm font-medium truncate">{u.email}</span>
                           </div>
-                          <div className="col-span-3"><span className="px-2 py-1 bg-white/10 rounded text-[10px] text-white/70 border border-white/20">{u.rol}</span></div>
+                          <div className="col-span-3">
+                            <span className="px-2 py-1 bg-white/10 rounded text-[10px] text-white/70 border border-white/20">
+                              {u.rol === 'ASISTENTE' ? 'MIEMBRO' : u.rol}
+                            </span>
+                          </div>
                           <div className="col-span-4 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => { setEditingUser(u); setActiveModal('editUser'); }} className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white">Editar</button>
                             <button onClick={() => handleBorrarUsuario(u.id)} className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium">Banear</button>
                           </div>
                         </div>
@@ -771,7 +749,7 @@ const DashboardPage = () => {
                   <select value={formDataUsuario.rol} onChange={e => setFormDataUsuario({...formDataUsuario, rol: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
                     <option className="bg-slate-900" value="ADMINISTRADOR">ADMINISTRADOR</option>
                     <option className="bg-slate-900" value="ORGANIZADOR">ORGANIZADOR</option>
-                    <option className="bg-slate-900" value="ASISTENTE">ASISTENTE</option>
+                    <option className="bg-slate-900" value="ASISTENTE">MIEMBRO</option>
                   </select>
                   <select value={formDataUsuario.estado} onChange={e => setFormDataUsuario({...formDataUsuario, estado: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
                     <option className="bg-slate-900" value="Activo">Activo</option>
@@ -783,31 +761,7 @@ const DashboardPage = () => {
             </motion.div>
           )}
 
-          {/* MODAL: EDITAR USUARIO */}
-          {activeModal === 'editUser' && editingUser && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-              <div className="absolute inset-0 cursor-pointer" onClick={() => setActiveModal('usersList')}></div>
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-md liquid-glass-strong border border-white/20 rounded-3xl p-8 relative z-10 shadow-2xl">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-heading italic text-white">Modificar Usuario</h3>
-                  <button onClick={() => setActiveModal('usersList')} className="text-xs text-white/50 hover:text-white">Cancelar</button>
-                </div>
-                <form className="flex flex-col gap-4" onSubmit={handleActualizarUsuario}>
-                  <input disabled type="email" value={editingUser.email} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/50 focus:outline-none cursor-not-allowed" />
-                  <select value={editingUser.rol} onChange={e => setEditingUser({...editingUser, rol: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="ADMINISTRADOR">ADMINISTRADOR</option>
-                    <option className="bg-slate-900" value="ORGANIZADOR">ORGANIZADOR</option>
-                    <option className="bg-slate-900" value="ASISTENTE">ASISTENTE</option>
-                  </select>
-                  <select value={editingUser.estado} onChange={e => setEditingUser({...editingUser, estado: e.target.value})} className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none appearance-none cursor-pointer">
-                    <option className="bg-slate-900" value="Activo">Activo</option>
-                    <option className="bg-slate-900" value="Inactivo">Inactivo</option>
-                  </select>
-                  <button type="submit" className="w-full bg-white text-black font-bold rounded-xl py-3 hover:bg-white/90 mt-2 transition-colors">Guardar Cambios</button>
-                </form>
-              </motion.div>
-            </motion.div>
-          )}
+          
 
         </AnimatePresence>
 
