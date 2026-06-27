@@ -1,33 +1,42 @@
-const API_URL = '/api';
+import { db } from '../firebase';
+import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
 
-// 1. LEER TODOS LOS USUARIOS (Directo de Authentication)
+const COLLECTION_NAME = 'usuarios';
+
+// 1. LEER TODOS LOS USUARIOS DIRECTO DE FIRESTORE
 export const obtenerUsuarios = async () => {
   try {
-    const response = await fetch(`${API_URL}/usuarios`);
-    if (!response.ok) throw new Error('Error al conectar con el servidor de Auth');
-    const usuarios = await response.json();
-    return usuarios;
+    const usuariosCol = collection(db, COLLECTION_NAME);
+    const usuariosSnapshot = await getDocs(usuariosCol);
+    const usuariosList = usuariosSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    return usuariosList;
   } catch (error) {
-    console.error("Error al obtener usuarios de Auth:", error);
+    console.error("Error al obtener usuarios:", error);
     return [];
   }
 };
 
-// 2. CREAR UN NUEVO USUARIO (Opcional por si tu web registra)
+// 2. CREAR UN NUEVO USUARIO EN FIRESTORE
 export const crearUsuario = async (nuevoUsuario) => {
   try {
-    console.warn("Para crear usuarios puramente en Auth se recomienda usar createUserWithEmailAndPassword en el frontend.");
-    return nuevoUsuario.id;
+    const id = nuevoUsuario.uid || nuevoUsuario.id || Date.now().toString();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await setDoc(docRef, nuevoUsuario);
+    return id;
   } catch (error) {
     console.error("Error al crear usuario:", error);
     throw error;
   }
 };
 
-// 3. ACTUALIZAR UN USUARIO 
+// 3. ACTUALIZAR UN USUARIO
 export const actualizarUsuario = async (idUsuario, usuarioActualizado) => {
   try {
-    console.log(`Simulando actualización para el usuario: ${idUsuario}`);
+    const usuarioRef = doc(db, COLLECTION_NAME, idUsuario);
+    await updateDoc(usuarioRef, usuarioActualizado);
     return true;
   } catch (error) {
     console.error("Error al actualizar usuario:", error);
@@ -35,30 +44,29 @@ export const actualizarUsuario = async (idUsuario, usuarioActualizado) => {
   }
 };
 
-// 4. ELIMINAR UN USUARIO 
+// 4. ELIMINAR UN USUARIO
 export const borrarUsuario = async (idUsuario) => {
   try {
-    const response = await fetch(`${API_URL}/usuarios/${idUsuario}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('No se pudo eliminar el usuario de Firebase Auth');
-    const data = await response.json();
-    
-    // Retornamos data.success para que coincida exactamente con lo que el Dashboard espera para cerrar el modal
-    return data.success; 
+    const usuarioRef = doc(db, COLLECTION_NAME, idUsuario);
+    await deleteDoc(usuarioRef);
+    return true;
   } catch (error) {
-    console.error("Error al borrar usuario de Auth:", error);
+    console.error("Error al borrar usuario:", error);
     throw error;
   }
 };
 
-// 5. OBTENER USUARIOS POR ROL (Filtrado en caliente para que no se rompan tus gráficos)
+// 5. OBTENER USUARIOS POR ROL
 export const obtenerUsuariosPorRol = async (rol) => {
   try {
-    const todosLosUsuarios = await obtenerUsuarios();
-    return todosLosUsuarios.filter(user => user.rol === rol);
+    const q = query(collection(db, COLLECTION_NAME), where("rol", "==", rol));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
   } catch (error) {
-    console.error("Error al obtener usuarios por rol:", error);
+    console.error("Error al filtrar por rol:", error);
     return [];
   }
 };
