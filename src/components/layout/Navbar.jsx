@@ -16,7 +16,7 @@ const Navbar = () => {
           onClick={() => navigate('/Login')} 
           className="px-4 py-2 text-sm font-medium text-white/80 font-body hover:text-white transition-colors rounded-full text-left"
         >
-          Unete
+          Acceso
         </button>
 
         <button className="bg-white text-black px-3 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 ml-2 whitespace-nowrap hover:bg-white/90 transition-colors">
