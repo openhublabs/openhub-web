@@ -19,9 +19,14 @@ const Navbar = () => {
           Acceso
         </button>
 
-        <button className="bg-white text-black px-3 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 ml-2 whitespace-nowrap hover:bg-white/90 transition-colors">
+        <a
+          href="https://github.com/openhublabs/openhub-app/releases/download/build-2/app-debug.apk"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-white text-black px-3 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 ml-2 whitespace-nowrap hover:bg-white/90 transition-colors"
+        >
           Descargar App <ArrowUpRight className="h-4 w-4" />
-        </button>
+        </a>
       </div>
       
       <div className="w-12 h-12 invisible"></div>
