@@ -1,5 +1,4 @@
-/* eslint-disable */
-const API_URL = 'http://localhost:5000/api';
+const API_URL = '/api';
 
 // 1. LEER TODOS LOS USUARIOS (Directo de Authentication)
 export const obtenerUsuarios = async () => {
@@ -9,7 +8,7 @@ export const obtenerUsuarios = async () => {
     const usuarios = await response.json();
     return usuarios;
   } catch (error) {
-    // console.error suppressed to avoid noise when backend is not running
+    console.error("Error al obtener usuarios de Auth:", error);
     return [];
   }
 };
@@ -17,8 +16,6 @@ export const obtenerUsuarios = async () => {
 // 2. CREAR UN NUEVO USUARIO (Opcional por si tu web registra)
 export const crearUsuario = async (nuevoUsuario) => {
   try {
-    // Como el registro fuerte ocurre en la app móvil, si necesitas crear desde la web
-    // lo ideal es usar el método estándar de Firebase Auth en el componente.
     console.warn("Para crear usuarios puramente en Auth se recomienda usar createUserWithEmailAndPassword en el frontend.");
     return nuevoUsuario.id;
   } catch (error) {
@@ -30,8 +27,6 @@ export const crearUsuario = async (nuevoUsuario) => {
 // 3. ACTUALIZAR UN USUARIO 
 export const actualizarUsuario = async (idUsuario, usuarioActualizado) => {
   try {
-    // Authentication no permite editar campos libres desde el cliente,
-    // devolvemos true simulado para que tus modales de la web no crasheen.
     console.log(`Simulando actualización para el usuario: ${idUsuario}`);
     return true;
   } catch (error) {
@@ -40,7 +35,7 @@ export const actualizarUsuario = async (idUsuario, usuarioActualizado) => {
   }
 };
 
-// 4. ELIMINAR UN USUARIO (Borra directo de Authentication usando tu server)
+// 4. ELIMINAR UN USUARIO 
 export const borrarUsuario = async (idUsuario) => {
   try {
     const response = await fetch(`${API_URL}/usuarios/${idUsuario}`, {
@@ -48,7 +43,9 @@ export const borrarUsuario = async (idUsuario) => {
     });
     if (!response.ok) throw new Error('No se pudo eliminar el usuario de Firebase Auth');
     const data = await response.json();
-    return data.success;
+    
+    // Retornamos data.success para que coincida exactamente con lo que el Dashboard espera para cerrar el modal
+    return data.success; 
   } catch (error) {
     console.error("Error al borrar usuario de Auth:", error);
     throw error;
@@ -58,8 +55,6 @@ export const borrarUsuario = async (idUsuario) => {
 // 5. OBTENER USUARIOS POR ROL (Filtrado en caliente para que no se rompan tus gráficos)
 export const obtenerUsuariosPorRol = async (rol) => {
   try {
-    // Como Auth puro no discrimina roles, traemos todos los usuarios del server 
-    // y los filtramos en un array para alimentar tus contadores del Dashboard.
     const todosLosUsuarios = await obtenerUsuarios();
     return todosLosUsuarios.filter(user => user.rol === rol);
   } catch (error) {
