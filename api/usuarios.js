@@ -1,20 +1,20 @@
 const { initializeApp, cert, getApps } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
-const path = require('path');
-const fs = require('fs');
 
-// Inicialización robusta: funciona tanto en Vercel (env vars) como en local (archivo JSON)
-let serviceAccount;
-let initSource = 'unknown';
-
-try {
+// ============================================================
+// INICIALIZACIÓN DE FIREBASE ADMIN
+// En Vercel: usa la variable de entorno FIREBASE_SERVICE_ACCOUNT
+// En local: usa el archivo firebase-admin.json
+// ============================================================
+function getServiceAccount() {
+  // 1. Variable de entorno con JSON completo (recomendado para Vercel)
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    // Producción (Vercel): lee desde variable de entorno (JSON completo)
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    initSource = 'FIREBASE_SERVICE_ACCOUNT env var';
-  } else if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY) {
-    // Alternativa: variables de entorno individuales
-    serviceAccount = {
+    return JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  }
+
+  // 2. Variables de entorno individuales (alternativa)
+  if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY) {
+    return {
       type: 'service_account',
       project_id: process.env.FIREBASE_PROJECT_ID,
       private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID || '',
@@ -24,50 +24,50 @@ try {
       auth_uri: 'https://accounts.google.com/o/oauth2/auth',
       token_uri: 'https://oauth2.googleapis.com/token',
     };
-    initSource = 'individual env vars';
-  } else {
-    // Local: lee desde archivo JSON
-    const jsonPath = path.resolve(__dirname, '..', 'firebase-admin.json');
-    if (fs.existsSync(jsonPath)) {
-      serviceAccount = require(jsonPath);
-      initSource = 'local JSON file';
-    } else {
-      throw new Error(
-        'No se encontraron credenciales de Firebase. ' +
-        'Configura FIREBASE_SERVICE_ACCOUNT en las variables de entorno de Vercel. ' +
-        'Ruta buscada: ' + jsonPath
-      );
-    }
   }
 
-  if (!getApps().length) {
-    initializeApp({
-      credential: cert(serviceAccount)
-    });
+  // 3. Archivo local (solo funciona en desarrollo)
+  try {
+    return require("../firebase-admin.json");
+  } catch (e) {
+    return null;
   }
-} catch (initError) {
-  // Guardamos el error para retornarlo en la respuesta
-  console.error('Error inicializando Firebase Admin:', initError);
-  module.exports = async (req, res) => {
-    return res.status(500).json({ 
-      error: 'Firebase initialization failed',
-      message: initError.message,
-      hint: 'Configura la variable de entorno FIREBASE_SERVICE_ACCOUNT en Vercel Dashboard > Settings > Environment Variables'
-    });
-  };
-  return; // Salimos para no definir el handler normal
 }
 
-const auth = getAuth();
+let auth = null;
+let initError = null;
+
+try {
+  const serviceAccount = getServiceAccount();
+  if (!serviceAccount) {
+    initError = 'No se encontraron credenciales de Firebase. Configura FIREBASE_SERVICE_ACCOUNT en Vercel Dashboard > Settings > Environment Variables.';
+  } else {
+    if (!getApps().length) {
+      initializeApp({ credential: cert(serviceAccount) });
+    }
+    auth = getAuth();
+  }
+} catch (e) {
+  initError = 'Error inicializando Firebase: ' + e.message;
+}
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  // Si Firebase no se pudo inicializar, retornar error descriptivo
+  if (initError || !auth) {
+    return res.status(500).json({
+      error: 'Firebase no inicializado',
+      message: initError || 'auth es null',
+      hint: 'Configura FIREBASE_SERVICE_ACCOUNT en Vercel Dashboard > Settings > Environment Variables con el contenido JSON del service account.'
+    });
   }
 
   if (req.method === 'GET') {
@@ -81,8 +81,7 @@ module.exports = async (req, res) => {
       }));
       return res.status(200).json(usuarios);
     } catch (error) {
-      console.error('Error listando usuarios:', error);
-      return res.status(500).json({ error: error.message, source: initSource });
+      return res.status(500).json({ error: error.message });
     }
   }
 
