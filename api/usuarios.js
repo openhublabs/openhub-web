@@ -2,13 +2,6 @@ const { initializeApp, cert, getApps } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 
 function getServiceAccount() {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    let sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    if (sa.private_key) {
-      sa.private_key = sa.private_key.replace(/\\n/g, '\n');
-    }
-    return sa;
-  }
   if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY) {
     return {
       type: 'service_account',
@@ -20,6 +13,13 @@ function getServiceAccount() {
       auth_uri: 'https://accounts.google.com/o/oauth2/auth',
       token_uri: 'https://oauth2.googleapis.com/token',
     };
+  }
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    let sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (sa.private_key) {
+      sa.private_key = sa.private_key.replace(/\\n/g, '\n');
+    }
+    return sa;
   }
   try {
     const fs = require('fs');
