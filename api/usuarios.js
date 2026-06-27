@@ -1,5 +1,6 @@
-const { initializeApp, cert, getApps } = require('firebase-admin/app');
-const { getAuth } = require('firebase-admin/auth');
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { createRequire } from 'module';
 
 // ============================================================
 // INICIALIZACIÓN DE FIREBASE ADMIN
@@ -28,6 +29,7 @@ function getServiceAccount() {
 
   // 3. Archivo local (solo funciona en desarrollo)
   try {
+    const require = createRequire(import.meta.url);
     return require("../firebase-admin.json");
   } catch (e) {
     return null;
@@ -51,7 +53,7 @@ try {
   initError = 'Error inicializando Firebase: ' + e.message;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -66,7 +68,7 @@ module.exports = async (req, res) => {
     return res.status(500).json({
       error: 'Firebase no inicializado',
       message: initError || 'auth es null',
-      hint: 'Configura FIREBASE_SERVICE_ACCOUNT en Vercel Dashboard > Settings > Environment Variables con el contenido JSON del service account.'
+      hint: 'Configura FIREBASE_SERVICE_ACCOUNT en Vercel Dashboard > Settings > Environment Variables'
     });
   }
 
@@ -86,4 +88,4 @@ module.exports = async (req, res) => {
   }
 
   return res.status(405).json({ error: 'Método no permitido. Use /api/usuarios/[uid]' });
-};
+}

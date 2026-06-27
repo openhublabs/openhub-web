@@ -1,5 +1,6 @@
-const { initializeApp, cert, getApps } = require('firebase-admin/app');
-const { getAuth } = require('firebase-admin/auth');
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { createRequire } from 'module';
 
 function getServiceAccount() {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
@@ -18,6 +19,7 @@ function getServiceAccount() {
     };
   }
   try {
+    const require = createRequire(import.meta.url);
     return require("../../firebase-admin.json");
   } catch (e) {
     return null;
@@ -41,7 +43,7 @@ try {
   initError = 'Error inicializando Firebase: ' + e.message;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'DELETE,PATCH,OPTIONS');
@@ -61,6 +63,7 @@ module.exports = async (req, res) => {
 
   const { uid } = req.query;
 
+  // 1. ELIMINAR (DELETE)
   if (req.method === 'DELETE') {
     try {
       await auth.deleteUser(uid);
@@ -70,6 +73,7 @@ module.exports = async (req, res) => {
     }
   }
 
+  // 2. MODIFICACIONES (PATCH)
   if (req.method === 'PATCH') {
     try {
       const { disabled, rol } = req.body;
@@ -87,4 +91,4 @@ module.exports = async (req, res) => {
   }
 
   return res.status(405).json({ error: 'Método no permitido' });
-};
+}
