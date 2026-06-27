@@ -3,7 +3,11 @@ const { getAuth } = require('firebase-admin/auth');
 
 function getServiceAccount() {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    return JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    let sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (sa.private_key) {
+      sa.private_key = sa.private_key.replace(/\\n/g, '\n');
+    }
+    return sa;
   }
   if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY) {
     return {
