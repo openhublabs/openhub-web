@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Firebase admin credentials (DO NOT COMMIT)
+firebase-admin.json

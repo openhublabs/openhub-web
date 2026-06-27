@@ -30,7 +30,7 @@ const LandingPage = () => {
               className="liquid-glass rounded-full flex items-center p-1 mb-8"
             >
               <span className="bg-white text-black px-3 py-1 text-xs font-semibold rounded-full">Nuevo</span>
-              <span className="text-sm text-white/90 pr-4 pl-3 font-medium">Únete a la comunidad de desarrolladores global</span>
+              <span className="text-sm text-white/90 pr-4 pl-3 font-medium">Acceso a la comunidad de desarrolladores global</span>
             </motion.div>
 
             <BlurText 
@@ -54,12 +54,12 @@ const LandingPage = () => {
               className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 mt-6"
             >
               <button 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/login')}
                 className="liquid-glass-strong rounded-full px-5 py-2.5 text-sm font-medium text-white flex items-center gap-2 hover:scale-105 transition-transform w-full sm:w-auto justify-center"
               >
-                Explorar Eventos <ArrowUpRight className="h-5 w-5" />
+                Entrar al Sistema <ArrowUpRight className="h-5 w-5" />
               </button>
-              <button className="flex items-center gap-2 text-sm font-medium text-white hover:text-white/80 transition-colors w-full sm:w-auto justify-center py-2 sm:py-0">
+              <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-sm font-medium text-white hover:text-white/80 transition-colors w-full sm:w-auto justify-center py-2 sm:py-0">
                 Ver Demo <Play className="h-4 w-4" />
               </button>
             </motion.div>
