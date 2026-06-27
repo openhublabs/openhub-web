@@ -18,7 +18,13 @@ function getServiceAccount() {
     };
   }
   try {
-    return require("../firebase-admin.json");
+    const fs = require('fs');
+    const path = require('path');
+    const localPath = path.resolve(__dirname, '../firebase-admin.json');
+    if (fs.existsSync(localPath)) {
+      return JSON.parse(fs.readFileSync(localPath, 'utf8'));
+    }
+    return null;
   } catch (e) {
     return null;
   }
